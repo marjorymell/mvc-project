@@ -5,16 +5,16 @@ class AuthenticationController {
     this.users = [];
   }
 
-  register(username, password) {
+  register(username, password, isAdmin = false) {
     const existingUser = this.users.find(u => u.username === username);
     if (existingUser) {
       console.log('User already exists.');
       return false;
     }
 
-    const newUser = new User(username, password);
+    const newUser = new User(username, password, isAdmin);
     this.users.push(newUser);
-    console.log('User registered successfully.');
+    console.log(`User ${username} registered successfully.`);
     return true;
   }
 
@@ -22,11 +22,16 @@ class AuthenticationController {
     const user = this.users.find(u => u.username === username && u.password === password);
     if (user) {
       console.log('Login successful.');
-      return true;
+      return user;
     } else {
       console.log('Invalid credentials.');
-      return false;
+      return null;
     }
+  }
+
+  isAdmin(username) {
+    const user = this.users.find(u => u.username === username);
+    return user ? user.isAdmin : false;
   }
 }
 

@@ -1,8 +1,12 @@
 const AuthenticationController = require('./controllers/AuthenticationController');
 const AuthenticationView = require('./views/AuthenticationView');
+const initializeUsers = require('./utils/initializeUsers');
 
 const authenticationController = new AuthenticationController();
 const authenticationView = new AuthenticationView();
+
+// Initialize default users
+initializeUsers(authenticationController);
 
 async function main() {
   while (true) {
@@ -20,10 +24,17 @@ async function main() {
 
       case 2: // Login
         const loginCredentials = await authenticationView.getCredentials();
-        authenticationController.login(loginCredentials.username, loginCredentials.password);
+        const loggedInUser = authenticationController.login(loginCredentials.username, loginCredentials.password);
+        if (loggedInUser) {
+          if (authenticationController.isAdmin(loggedInUser.username)) {
+            authenticationView.displayMessage('Logged in as admin.');
+          } else {
+            authenticationView.displayMessage('Logged in as regular user.');
+          }
+        }
         break;
 
-      case 3: // Exit
+      case 3:
         authenticationView.displayMessage('Thank you for using our service. Goodbye!');
         authenticationView.close();
         return;
