@@ -90,7 +90,6 @@ async function main() {
             await handleProductCatalog(loggedInUser.username);
           } else {
             authenticationView.displayMessage('Logged in as regular user.');
-            // Here you can add regular user functionality
           }
         }
         break;
