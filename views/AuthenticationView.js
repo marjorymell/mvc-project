@@ -1,37 +1,31 @@
-const readline = require('readline');
-
 class AuthenticationView {
   constructor() {
-    this.rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
+    process.stdin.setEncoding('utf8');
   }
 
-  displayMainMenu() {
-    return new Promise((resolve) => {
-      console.log('\n--- Main Menu ---');
-      console.log('1. Register');
-      console.log('2. Login');
-      console.log('3. Exit');
-      this.rl.question('Choose an option: ', (answer) => {
-        resolve(parseInt(answer));
-      });
-    });
+  async displayMainMenu() {
+    console.log('\n--- Main Menu ---');
+    console.log('1. Register');
+    console.log('2. Login');
+    console.log('3. Exit');
+    return parseInt(await this.getInput('Choose an option: '));
   }
 
-  getCredentials(isRegistration = false) {
+  async getCredentials(isRegistration = false) {
+    const username = await this.getInput('Enter your username: ');
+    const password = await this.getInput('Enter your password: ');
+    if (isRegistration) {
+      const confirmPassword = await this.getInput('Confirm your password: ');
+      return { username, password, confirmPassword };
+    }
+    return { username, password };
+  }
+
+  getInput(prompt) {
     return new Promise((resolve) => {
-      this.rl.question('Enter your username: ', (username) => {
-        this.rl.question('Enter your password: ', (password) => {
-          if (isRegistration) {
-            this.rl.question('Confirm your password: ', (confirmPassword) => {
-              resolve({ username, password, confirmPassword });
-            });
-          } else {
-            resolve({ username, password });
-          }
-        });
+      process.stdout.write(prompt);
+      process.stdin.once('data', (data) => {
+        resolve(data.toString().trim());
       });
     });
   }
@@ -41,7 +35,6 @@ class AuthenticationView {
   }
 
   close() {
-    this.rl.close();
   }
 }
 
