@@ -1,18 +1,11 @@
-const AuthenticationController = require('./controllers/AuthenticationController');
-const AuthenticationView = require('./views/AuthenticationView');
-const ProductCatalogController = require('./controllers/ProductCatalogController');
-const ProductCatalogView = require('./views/ProductCatalogView');
-const ProductCatalogService = require('./services/ProductCatalogService');
-const initializeUsers = require('./utils/initializeUsers');
+const container = require('./utils/container')(); 
 
-const authenticationController = new AuthenticationController();
-const authenticationView = new AuthenticationView();
-const productCatalogService = new ProductCatalogService();
-const productCatalogController = new ProductCatalogController(productCatalogService, authenticationController);
-const productCatalogView = new ProductCatalogView();
-
-// Initialize default users
-initializeUsers(authenticationController);
+const {
+  authenticationController,
+  authenticationView,
+  productCatalogController,
+  productCatalogView,
+} = container;
 
 async function handleProductCatalog(username) {
   while (true) {
@@ -27,14 +20,25 @@ async function handleProductCatalog(username) {
         break;
       case 2: // Add a product
         const newProductDetails = await productCatalogView.getProductDetails();
-        const newProduct = productCatalogController.addProduct(username, newProductDetails.name, newProductDetails.price, newProductDetails.stock);
+        const newProduct = productCatalogController.addProduct(
+          username,
+          newProductDetails.name,
+          newProductDetails.price,
+          newProductDetails.stock
+        );
         if (newProduct) {
           productCatalogView.displayMessage('Product added successfully.');
         }
         break;
       case 3: // Update a product
         const updateProductDetails = await productCatalogView.getProductDetails(true);
-        const updated = productCatalogController.updateProduct(username, updateProductDetails.id, updateProductDetails.name, updateProductDetails.price, updateProductDetails.stock);
+        const updated = productCatalogController.updateProduct(
+          username,
+          updateProductDetails.id,
+          updateProductDetails.name,
+          updateProductDetails.price,
+          updateProductDetails.stock
+        );
         if (updated) {
           productCatalogView.displayMessage('Product updated successfully.');
         } else {
@@ -68,12 +72,18 @@ async function main() {
         if (registrationCredentials.password !== registrationCredentials.confirmPassword) {
           authenticationView.displayMessage('Passwords do not match. Please try again.');
         } else {
-          authenticationController.register(registrationCredentials.username, registrationCredentials.password);
+          authenticationController.register(
+            registrationCredentials.username,
+            registrationCredentials.password
+          );
         }
         break;
       case 2: // Login
         const loginCredentials = await authenticationView.getCredentials();
-        const loggedInUser = authenticationController.login(loginCredentials.username, loginCredentials.password);
+        const loggedInUser = authenticationController.login(
+          loginCredentials.username,
+          loginCredentials.password
+        );
         if (loggedInUser) {
           if (authenticationController.isAdmin(loggedInUser.username)) {
             authenticationView.displayMessage('Logged in as admin.');
