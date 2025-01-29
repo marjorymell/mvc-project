@@ -1,63 +1,52 @@
-const container = require('./utils/container')(); 
+const container = require('./utils/container')();
 
 const {
   authenticationController,
   authenticationView,
   productCatalogController,
   productCatalogView,
+  orderController,
+  orderView,
 } = container;
 
-async function handleProductCatalog(username) {
+async function handleOrders(username) {
   while (true) {
-    const choice = await productCatalogView.displayCatalogMenu();
+    const choice = await orderView.displayOrderMenu();
 
     switch (choice) {
-      case 1: // View all products
+      case 1: // Create a new order
         const products = productCatalogController.getAllProducts(username);
         if (products) {
-          productCatalogView.displayProducts(products);
+          const items = await orderView.getOrderItems(products);
+          const newOrder = orderController.createOrder(username, items);
+          if (newOrder) {
+            orderView.displayMessage('Order created successfully.');
+          }
         }
         break;
-      case 2: // Add a product
-        const newProductDetails = await productCatalogView.getProductDetails();
-        const newProduct = productCatalogController.addProduct(
-          username,
-          newProductDetails.name,
-          newProductDetails.price,
-          newProductDetails.stock
-        );
-        if (newProduct) {
-          productCatalogView.displayMessage('Product added successfully.');
+      case 2: // View my orders
+        const orders = orderController.getUserOrders(username);
+        if (orders) {
+          orderView.displayOrders(orders);
         }
         break;
-      case 3: // Update a product
-        const updateProductDetails = await productCatalogView.getProductDetails(true);
-        const updated = productCatalogController.updateProduct(
-          username,
-          updateProductDetails.id,
-          updateProductDetails.name,
-          updateProductDetails.price,
-          updateProductDetails.stock
-        );
-        if (updated) {
-          productCatalogView.displayMessage('Product updated successfully.');
+      case 3: // Update order status (Admin only)
+        if (authenticationController.isAdmin(username)) {
+          const { orderId, newStatus } = await orderView.getOrderUpdateDetails();
+          const updated = orderController.updateOrderStatus(username, orderId, newStatus);
+          if (updated) {
+            orderView.displayMessage('Order status updated successfully.');
+          } else {
+            orderView.displayMessage('Failed to update order status.');
+          }
         } else {
-          productCatalogView.displayMessage('Failed to update product.');
+          orderView.displayMessage('Access denied. Admin rights required.');
         }
         break;
-      case 4: // Delete a product
-        const productId = await productCatalogView.getProductId();
-        const deleted = productCatalogController.deleteProduct(username, productId);
-        if (deleted) {
-          productCatalogView.displayMessage('Product deleted successfully.');
-        } else {
-          productCatalogView.displayMessage('Failed to delete product.');
-        }
-        break;
-      case 5: // Return to main menu
+      case 4: // Return to main menu
         return;
       default:
-        productCatalogView.displayMessage('Invalid option. Please try again.');
+        orderView.displayMessage('Invalid option. Please try again.');
     }
   }
 }
@@ -87,9 +76,25 @@ async function main() {
         if (loggedInUser) {
           if (authenticationController.isAdmin(loggedInUser.username)) {
             authenticationView.displayMessage('Logged in as admin.');
-            await handleProductCatalog(loggedInUser.username);
+            while (true) {
+              console.log('\n--- Admin Menu ---');
+              console.log('1. Manage Product Catalog');
+              console.log('2. Manage Orders');
+              console.log('3. Logout');
+              const adminChoice = parseInt(await authenticationView.getInput('Choose an option: '));
+              if (adminChoice === 1) {
+                await handleProductCatalog(loggedInUser.username);
+              } else if (adminChoice === 2) {
+                await handleOrders(loggedInUser.username);
+              } else if (adminChoice === 3) {
+                break;
+              } else {
+                authenticationView.displayMessage('Invalid option. Please try again.');
+              }
+            }
           } else {
             authenticationView.displayMessage('Logged in as regular user.');
+            await handleOrders(loggedInUser.username);
           }
         }
         break;
@@ -97,6 +102,7 @@ async function main() {
         authenticationView.displayMessage('Thank you for using our service. Goodbye!');
         authenticationView.close();
         productCatalogView.close();
+        orderView.close();
         return;
       default:
         authenticationView.displayMessage('Invalid option. Please try again.');
