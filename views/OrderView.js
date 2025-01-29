@@ -23,7 +23,18 @@ class OrderView {
         const productId = parseInt(await this.getInput('Enter product ID (or 0 to finish): '));
         if (productId === 0) break;
   
+        const product = products.find(p => p.id === productId);
+        if (!product) {
+          console.log('Invalid product ID. Please try again.');
+          continue;
+        }
+  
         const quantity = parseInt(await this.getInput('Enter quantity: '));
+        if (quantity > product.stock) {
+          console.log(`Insufficient stock. Available: ${product.stock}, Requested: ${quantity}`);
+          continue;
+        }
+  
         items.push({ productId, quantity });
       }
   
