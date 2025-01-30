@@ -1,4 +1,3 @@
-// utils/container.js
 const AuthenticationController = require('../controllers/AuthenticationController');
 const AuthenticationView = require('../views/AuthenticationView');
 const ProductCatalogController = require('../controllers/ProductCatalogController');

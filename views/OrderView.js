@@ -12,16 +12,25 @@ class OrderView {
       return parseInt(await this.getInput('Choose an option: '));
     }
   
-    async getOrderItems(products) {
-      const items = [];
+    displayAvailableProducts(products) {
       console.log('\nAvailable products:');
       products.forEach(product => {
         console.log(`ID: ${product.id}, Name: ${product.name}, Price: $${product.price}, Stock: ${product.stock}`);
       });
+    }
   
-      while (true) {
+    async getOrderItems(products) {
+      const items = [];
+      let continueOrdering = true;
+  
+      while (continueOrdering) {
+        this.displayAvailableProducts(products);
+  
         const productId = parseInt(await this.getInput('Enter product ID (or 0 to finish): '));
-        if (productId === 0) break;
+        if (productId === 0) {
+          continueOrdering = false;
+          continue;
+        }
   
         const product = products.find(p => p.id === productId);
         if (!product) {
@@ -30,12 +39,18 @@ class OrderView {
         }
   
         const quantity = parseInt(await this.getInput('Enter quantity: '));
+        if (isNaN(quantity) || quantity <= 0) {
+          console.log('Invalid quantity. Please enter a positive number.');
+          continue;
+        }
+  
         if (quantity > product.stock) {
           console.log(`Insufficient stock. Available: ${product.stock}, Requested: ${quantity}`);
           continue;
         }
   
         items.push({ productId, quantity });
+        product.stock -= quantity; 
       }
   
       return items;

@@ -4,13 +4,8 @@ class ProductCatalogController {
       this.authenticationController = authenticationController;
     }
   
-    getAllProducts(username) {
-      if (this.authenticationController.isAdmin(username)) {
+    getAllProducts() {
         return this.productCatalogService.getAllProducts();
-      } else {
-        console.log("Access denied. Admin rights required.");
-        return null;
-      }
     }
   
     addProduct(username, name, price, stock) {

@@ -15,12 +15,16 @@ async function handleOrders(username) {
 
     switch (choice) {
       case 1: // Create a new order
-        const products = productCatalogController.getAllProducts(username);
+        const products = productCatalogController.getAllProducts();
         if (products) {
           const items = await orderView.getOrderItems(products);
-          const newOrder = orderController.createOrder(username, items);
-          if (newOrder) {
-            orderView.displayMessage('Order created successfully.');
+          if (items.length > 0) {
+            const newOrder = orderController.createOrder(username, items);
+            if (newOrder) {
+              orderView.displayMessage('Order created successfully.');
+            }
+          } else {
+            orderView.displayMessage('No items added to the order.');
           }
         }
         break;

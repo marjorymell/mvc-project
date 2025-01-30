@@ -27,9 +27,9 @@ class ProductCatalogService {
   updateProduct(id, name, price, stock) {
     const product = this.getProductById(id);
     if (product) {
-      product.name = name;
-      product.price = price;
-      product.stock = stock;
+      if (name !== null && name !== undefined) product.name = name;
+      if (price !== null && price !== undefined) product.price = price;
+      if (stock !== null && stock !== undefined) product.stock = stock;
       return true;
     }
     return false;

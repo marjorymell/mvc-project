@@ -6,7 +6,7 @@ class OrderService {
     this.productCatalogService = productCatalogService;
   }
 
-  createOrder(userId, items) {
+createOrder(userId, items) {
     // Check stock and calculate total
     let total = 0;
     const updatedItems = [];
@@ -30,17 +30,19 @@ class OrderService {
 
     // Update stock
     for (const item of items) {
+      const product = this.productCatalogService.getProductById(item.productId);
       this.productCatalogService.updateProduct(
         item.productId,
-        null,
-        null,
-        this.productCatalogService.getProductById(item.productId).stock - item.quantity
+        undefined,
+        undefined,
+        product.stock - item.quantity
       );
     }
 
     console.log(`Order ${orderId} created successfully.`);
     return newOrder;
   }
+
 
   getOrderById(orderId) {
     return this.orders.find(order => order.id === orderId);
