@@ -1,4 +1,4 @@
-const container = require('./utils/container')();
+const container = require('./src/utils/container')();
 
 const {
   authenticationController,

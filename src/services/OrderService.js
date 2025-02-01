@@ -1,4 +1,4 @@
-const Order = require('../models/Order');
+const Order = require('../models/Order'); // Importe a classe Order
 
 class OrderService {
   constructor(productCatalogService, paymentService) {
@@ -26,7 +26,7 @@ class OrderService {
     }
 
     const orderId = this.orders.length + 1;
-    const newOrder = new Order(orderId, userId, updatedItems, total);
+    const newOrder = new Order(orderId, userId, updatedItems, total); // Usando a classe Order
     this.orders.push(newOrder);
 
     for (const item of items) {
@@ -43,14 +43,17 @@ class OrderService {
   }
 
   processPayment(orderId, paymentMethod) {
-    console.log(`OrderService: Processing payment for order ${orderId}`);
+    console.log(`OrderService: Requesting payment processing for order ${orderId}`);
     const order = this.getOrderById(orderId);
     if (!order) {
       console.log(`OrderService: Order ${orderId} not found`);
       return null;
     }
 
+    // Delegate payment processing to PaymentService
     const paymentResult = this.paymentService.processPayment(orderId, order.total, paymentMethod);
+    
+    // Update order status based on payment result
     order.status = paymentResult.status;
     console.log(`OrderService: Payment processed for order ${orderId}. Status: ${order.status}`);
     return paymentResult;
