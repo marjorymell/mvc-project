@@ -34,7 +34,13 @@ async function handleOrders(username) {
           orderView.displayOrders(orders);
         }
         break;
-      case 3: // Update order status (Admin only)
+        case 3: // Process payment for an order
+        const availableMethods = orderController.getAvailablePaymentMethods();
+        const paymentDetails = await orderView.getPaymentDetails(availableMethods);
+        const paymentResult = orderController.processPayment(username, paymentDetails.orderId, paymentDetails.paymentMethod);
+        orderView.displayPaymentResult(paymentResult);
+        break;
+        case 4: // Update order status (Admin only)
         if (authenticationController.isAdmin(username)) {
           const { orderId, newStatus } = await orderView.getOrderUpdateDetails();
           const updated = orderController.updateOrderStatus(username, orderId, newStatus);
@@ -47,7 +53,7 @@ async function handleOrders(username) {
           orderView.displayMessage('Access denied. Admin rights required.');
         }
         break;
-      case 4: // Return to main menu
+        case 5: // Return to main menu
         return;
       default:
         orderView.displayMessage('Invalid option. Please try again.');
@@ -65,10 +71,13 @@ async function main() {
         if (registrationCredentials.password !== registrationCredentials.confirmPassword) {
           authenticationView.displayMessage('Passwords do not match. Please try again.');
         } else {
-          authenticationController.register(
+          const registered = authenticationController.register(
             registrationCredentials.username,
             registrationCredentials.password
           );
+          if (registered) {
+            authenticationView.displayMessage('Registration successful. Please login.');
+          }
         }
         break;
       case 2: // Login

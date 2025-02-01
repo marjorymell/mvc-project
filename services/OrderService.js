@@ -1,23 +1,24 @@
 const Order = require('../models/Order');
 
 class OrderService {
-  constructor(productCatalogService) {
+  constructor(productCatalogService, paymentService) {
     this.orders = [];
     this.productCatalogService = productCatalogService;
+    this.paymentService = paymentService;
   }
 
-createOrder(userId, items) {
-    // Check stock and calculate total
+  createOrder(userId, items) {
+    console.log(`OrderService: Creating order for user ${userId}`);
     let total = 0;
     const updatedItems = [];
     for (const item of items) {
       const product = this.productCatalogService.getProductById(item.productId);
       if (!product) {
-        console.log(`Product ${item.productId} not found`);
+        console.log(`OrderService: Product ${item.productId} not found`);
         return null;
       }
       if (product.stock < item.quantity) {
-        console.log(`Insufficient stock for product ${item.productId}. Available: ${product.stock}, Requested: ${item.quantity}`);
+        console.log(`OrderService: Insufficient stock for product ${item.productId}`);
         return null;
       }
       total += product.price * item.quantity;
@@ -28,21 +29,32 @@ createOrder(userId, items) {
     const newOrder = new Order(orderId, userId, updatedItems, total);
     this.orders.push(newOrder);
 
-    // Update stock
     for (const item of items) {
-      const product = this.productCatalogService.getProductById(item.productId);
       this.productCatalogService.updateProduct(
         item.productId,
-        undefined,
-        undefined,
-        product.stock - item.quantity
+        null,
+        null,
+        this.productCatalogService.getProductById(item.productId).stock - item.quantity
       );
     }
 
-    console.log(`Order ${orderId} created successfully.`);
+    console.log(`OrderService: Order ${orderId} created successfully`);
     return newOrder;
   }
 
+  processPayment(orderId, paymentMethod) {
+    console.log(`OrderService: Processing payment for order ${orderId}`);
+    const order = this.getOrderById(orderId);
+    if (!order) {
+      console.log(`OrderService: Order ${orderId} not found`);
+      return null;
+    }
+
+    const paymentResult = this.paymentService.processPayment(orderId, order.total, paymentMethod);
+    order.status = paymentResult.status;
+    console.log(`OrderService: Payment processed for order ${orderId}. Status: ${order.status}`);
+    return paymentResult;
+  }
 
   getOrderById(orderId) {
     return this.orders.find(order => order.id === orderId);
@@ -53,13 +65,20 @@ createOrder(userId, items) {
   }
 
   updateOrderStatus(orderId, newStatus) {
-    const order = this.getOrderById(orderId);
-    if (order) {
-      order.status = newStatus;
-      console.log(`Order ${orderId} status updated to ${newStatus}.`);
-      return true;
+    console.log(`OrderService: Updating status for order ${orderId}`);
+    const updated = this.paymentService.updateOrderStatus(orderId, newStatus);
+    if (updated) {
+      const order = this.getOrderById(orderId);
+      if (order) {
+        order.status = newStatus;
+        console.log(`OrderService: Order ${orderId} status updated to ${newStatus}`);
+      }
     }
-    return false;
+    return updated;
+  }
+
+  getAvailablePaymentMethods() {
+    return this.paymentService.getAvailablePaymentMethods();
   }
 }
 

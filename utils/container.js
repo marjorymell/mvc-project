@@ -1,35 +1,27 @@
 const AuthenticationController = require('../controllers/AuthenticationController');
-const AuthenticationView = require('../views/AuthenticationView');
 const ProductCatalogController = require('../controllers/ProductCatalogController');
-const ProductCatalogView = require('../views/ProductCatalogView');
-const ProductCatalogService = require('../services/ProductCatalogService');
 const OrderController = require('../controllers/OrderController');
+const AuthenticationView = require('../views/AuthenticationView');
+const ProductCatalogView = require('../views/ProductCatalogView');
 const OrderView = require('../views/OrderView');
+const ProductCatalogService = require('../services/ProductCatalogService');
 const OrderService = require('../services/OrderService');
-const initializeUsers = require('./initializeUsers');
+const PaymentService = require('../services/PaymentService');
 
-const container = () => {
+function container() {
   const authenticationController = new AuthenticationController();
-  const authenticationView = new AuthenticationView();
   const productCatalogService = new ProductCatalogService();
-  const productCatalogController = new ProductCatalogController(productCatalogService, authenticationController);
-  const productCatalogView = new ProductCatalogView();
-  const orderService = new OrderService(productCatalogService);
-  const orderController = new OrderController(orderService, authenticationController);
-  const orderView = new OrderView();
-
-  initializeUsers(authenticationController);
-
+  const paymentService = new PaymentService();
+  const orderService = new OrderService(productCatalogService, paymentService);
+  
   return {
     authenticationController,
-    authenticationView,
-    productCatalogService,
-    productCatalogController,
-    productCatalogView,
-    orderService,
-    orderController,
-    orderView,
+    productCatalogController: new ProductCatalogController(productCatalogService, authenticationController),
+    orderController: new OrderController(orderService, authenticationController),
+    authenticationView: new AuthenticationView(),
+    productCatalogView: new ProductCatalogView(),
+    orderView: new OrderView(),
   };
-};
+}
 
 module.exports = container;

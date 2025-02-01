@@ -1,16 +1,17 @@
 class OrderView {
-    constructor() {
-      process.stdin.setEncoding('utf8');
-    }
-  
-    async displayOrderMenu() {
-      console.log('\n--- Order Menu ---');
-      console.log('1. Create a new order');
-      console.log('2. View my orders');
-      console.log('3. Update order status (Admin only)');
-      console.log('4. Return to main menu');
-      return parseInt(await this.getInput('Choose an option: '));
-    }
+  constructor() {
+    process.stdin.setEncoding('utf8');
+  }
+
+  async displayOrderMenu() {
+    console.log('\n--- Order Menu ---');
+    console.log('1. Create a new order');
+    console.log('2. View my orders');
+    console.log('3. Process payment for an order');
+    console.log('4. Update order status (Admin only)');
+    console.log('5. Return to main menu');
+    return parseInt(await this.getInput('Choose an option: '));
+  }
   
     displayAvailableProducts(products) {
       console.log('\nAvailable products:');
@@ -72,6 +73,21 @@ class OrderView {
       const orderId = parseInt(await this.getInput('Enter order ID to update: '));
       const newStatus = await this.getInput('Enter new status: ');
       return { orderId, newStatus };
+    }
+
+    async getPaymentDetails(availableMethods) {
+      console.log('\nAvailable payment methods:');
+      availableMethods.forEach((method, index) => {
+        console.log(`${index + 1}. ${method}`);
+      });
+      const methodIndex = parseInt(await this.getInput('Choose a payment method: ')) - 1;
+      const orderId = parseInt(await this.getInput('Enter the order ID to process payment: '));
+      return { orderId, paymentMethod: availableMethods[methodIndex] };
+    }
+  
+    displayPaymentResult(result) {
+      console.log(`\nPayment Result: ${result.message}`);
+      console.log(`Order Status: ${result.status}`);
     }
   
     getInput(prompt) {

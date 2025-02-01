@@ -3,6 +3,13 @@ const User = require('../models/User');
 class AuthenticationController {
   constructor() {
     this.users = [];
+    this.initializeDefaultUsers();
+  }
+
+  initializeDefaultUsers() {
+    this.register('admin', 'admin123', true);
+    this.register('user', 'user123', false);
+    console.log('Default users created.');
   }
 
   register(username, password, isAdmin = false) {
@@ -12,7 +19,7 @@ class AuthenticationController {
       return false;
     }
 
-    const newUser = new User(username, password, isAdmin);
+    const newUser = { username, password, isAdmin };
     this.users.push(newUser);
     console.log(`User ${username} registered successfully.`);
     return true;
