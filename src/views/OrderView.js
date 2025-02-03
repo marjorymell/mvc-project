@@ -23,9 +23,9 @@ class OrderView {
     async getOrderItems(products) {
       const items = [];
       let continueOrdering = true;
-  
+      this.displayAvailableProducts(products);
+
       while (continueOrdering) {
-        this.displayAvailableProducts(products);
   
         const productId = parseInt(await this.getInput('Enter product ID (or 0 to finish): '));
         if (productId === 0) {
@@ -51,7 +51,6 @@ class OrderView {
         }
   
         items.push({ productId, quantity });
-        product.stock -= quantity; 
       }
   
       return items;

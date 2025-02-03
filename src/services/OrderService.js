@@ -11,14 +11,15 @@ class OrderService {
     console.log(`OrderService: Creating order for user ${userId}`);
     let total = 0;
     const updatedItems = [];
+
     for (const item of items) {
       const product = this.productCatalogService.getProductById(item.productId);
       if (!product) {
         console.log(`OrderService: Product ${item.productId} not found`);
         return null;
       }
-      if (product.stock < item.quantity) {
-        console.log(`OrderService: Insufficient stock for product ${item.productId}`);
+      if (product.stock < item.quantity) { 
+        console.log(`OrderService: Insufficient stock for product ${item.productId}. Available: ${product.stock}, Requested: ${item.quantity}`);
         return null;
       }
       total += product.price * item.quantity;
@@ -30,11 +31,12 @@ class OrderService {
     this.orders.push(newOrder);
 
     for (const item of items) {
+      const product = this.productCatalogService.getProductById(item.productId);
       this.productCatalogService.updateProduct(
         item.productId,
         null,
         null,
-        this.productCatalogService.getProductById(item.productId).stock - item.quantity
+        product.stock - item.quantity 
       );
     }
 
