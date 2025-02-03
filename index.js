@@ -61,6 +61,62 @@ async function handleOrders(username) {
   }
 }
 
+async function handleProductCatalog(username) {
+  while (true) {
+    const choice = await productCatalogView.displayCatalogMenu();
+
+    switch (choice) {
+      case 1: // View all products
+        const products = productCatalogController.getAllProducts();
+        productCatalogView.displayProducts(products);
+        break;
+      case 2: // Add a product
+        if (authenticationController.isAdmin(username)) {
+          const productDetails = await productCatalogView.getProductDetails();
+          const newProduct = productCatalogController.addProduct(username, productDetails.name, productDetails.price, productDetails.stock);
+          if (newProduct) {
+            productCatalogView.displayMessage('Product added successfully.');
+          } else {
+            productCatalogView.displayMessage('Failed to add product.');
+          }
+        } else {
+          productCatalogView.displayMessage('Access denied. Admin rights required.');
+        }
+        break;
+      case 3: // Update a product
+        if (authenticationController.isAdmin(username)) {
+          const updateDetails = await productCatalogView.getProductDetails(true);
+          const updated = productCatalogController.updateProduct(username, updateDetails.id, updateDetails.name, updateDetails.price, updateDetails.stock);
+          if (updated) {
+            productCatalogView.displayMessage('Product updated successfully.');
+          } else {
+            productCatalogView.displayMessage('Failed to update product.');
+          }
+        } else {
+          productCatalogView.displayMessage('Access denied. Admin rights required.');
+        }
+        break;
+      case 4: // Delete a product
+        if (authenticationController.isAdmin(username)) {
+          const productId = await productCatalogView.getProductId();
+          const deleted = productCatalogController.deleteProduct(username, productId);
+          if (deleted) {
+            productCatalogView.displayMessage('Product deleted successfully.');
+          } else {
+            productCatalogView.displayMessage('Failed to delete product.');
+          }
+        } else {
+          productCatalogView.displayMessage('Access denied. Admin rights required.');
+        }
+        break;
+      case 5: // Return to main menu
+        return;
+      default:
+        productCatalogView.displayMessage('Invalid option. Please try again.');
+    }
+  }
+}
+
 async function main() {
   while (true) {
     const choice = await authenticationView.displayMainMenu();
