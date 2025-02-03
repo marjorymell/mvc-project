@@ -9,14 +9,17 @@ class ProductCatalogService {
     ];
   }
 
+  // Retrieves all available products
   getAllProducts() {
     return this.products;
   }
 
+  // Retrieves a product by its ID
   getProductById(id) {
     return this.products.find(product => product.id === id);
   }
 
+  // Adds a new product to the catalog
   addProduct(name, price, stock) {
     const id = this.products.length + 1;
     const newProduct = new Product(id, name, price, stock);
@@ -24,6 +27,7 @@ class ProductCatalogService {
     return newProduct;
   }
 
+  // Updates product details if it exists
   updateProduct(id, name, price, stock) {
     const product = this.getProductById(id);
     if (product) {
@@ -35,6 +39,7 @@ class ProductCatalogService {
     return false;
   }
 
+  // Removes a product from the catalog
   deleteProduct(id) {
     const index = this.products.findIndex(product => product.id === id);
     if (index !== -1) {

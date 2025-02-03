@@ -3,6 +3,7 @@ class OrderView {
     process.stdin.setEncoding('utf8');
   }
 
+  // Displays the order management menu
   async displayOrderMenu() {
     console.log('\n--- Order Menu ---');
     console.log('1. Create a new order');
@@ -13,6 +14,7 @@ class OrderView {
     return parseInt(await this.getInput('Choose an option: '));
   }
   
+    // Displays available products for purchase
     displayAvailableProducts(products) {
       console.log('\nAvailable products:');
       products.forEach(product => {
@@ -20,6 +22,7 @@ class OrderView {
       });
     }
   
+     // Allows user to select products and specify quantities for an order
     async getOrderItems(products) {
       const items = [];
       let continueOrdering = true;
@@ -56,6 +59,7 @@ class OrderView {
       return items;
     }
   
+     // Displays a list of user orders
     displayOrders(orders) {
       console.log('\n--- Your Orders ---');
       orders.forEach(order => {
@@ -68,12 +72,14 @@ class OrderView {
       });
     }
   
+    // Allows admin to update order status
     async getOrderUpdateDetails() {
       const orderId = parseInt(await this.getInput('Enter order ID to update: '));
       const newStatus = await this.getInput('Enter new status: ');
       return { orderId, newStatus };
     }
 
+    // Handles user input for processing a payment
     async getPaymentDetails(availableMethods) {
       console.log('\nAvailable payment methods:');
       availableMethods.forEach((method, index) => {
@@ -88,7 +94,8 @@ class OrderView {
       console.log(`\nPayment Result: ${result.message}`);
       console.log(`Order Status: ${result.status}`);
     }
-  
+
+     // Handles user input asynchronously
     getInput(prompt) {
       return new Promise((resolve) => {
         process.stdout.write(prompt);

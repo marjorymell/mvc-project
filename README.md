@@ -42,6 +42,20 @@ This project implements a microservices-based Order Management System using Node
 1. Ensure you have Node.js installed on your system.
 2. Run the application: node index.js
 
+## Default Login Credentials
+
+### Admin User
+
+- Username: admin
+- Password: admin123
+- Access: Full system permissions
+
+### Regular User
+
+- Username: user
+- Password: user123
+- Access: Order creation and payment processing
+
 ## Usage
 
 Upon running the application, you'll be presented with a main menu:

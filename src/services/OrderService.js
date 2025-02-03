@@ -7,6 +7,7 @@ class OrderService {
     this.paymentService = paymentService;
   }
 
+  // Creates a new order if products are available
   createOrder(userId, items) {
     console.log(`OrderService: Creating order for user ${userId}`);
     let total = 0;
@@ -30,6 +31,7 @@ class OrderService {
     const newOrder = new Order(orderId, userId, updatedItems, total);
     this.orders.push(newOrder);
 
+    // Updates stock after order creation
     for (const item of items) {
       const product = this.productCatalogService.getProductById(item.productId);
       this.productCatalogService.updateProduct(
@@ -61,14 +63,17 @@ class OrderService {
     return paymentResult;
   }
 
+  // Retrieves an order by ID
   getOrderById(orderId) {
     return this.orders.find(order => order.id === orderId);
   }
 
+  // Retrieves all orders for a specific user
   getUserOrders(userId) {
     return this.orders.filter(order => order.userId === userId);
   }
 
+  // Updates the status of an existing order
   updateOrderStatus(orderId, newStatus) {
     console.log(`OrderService: Updating status for order ${orderId}`);
     const updated = this.paymentService.updateOrderStatus(orderId, newStatus);

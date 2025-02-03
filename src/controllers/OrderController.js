@@ -8,6 +8,7 @@ class OrderController {
     return this.orderService.createOrder(username, items);
   }
 
+  // Processing is done by the payment service, here it is only presented in the CLI
   processPayment(username, orderId, paymentMethod) {
     return this.orderService.processPayment(orderId, paymentMethod);
   }

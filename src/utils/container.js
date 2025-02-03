@@ -1,3 +1,7 @@
+/**
+ * Dependency container to centralize instance creation and injection, 
+ * reducing direct imports in the index file and improving code organization.
+ */
 const AuthenticationController = require("../controllers/AuthenticationController")
 const ProductCatalogController = require("../controllers/ProductCatalogController")
 const OrderController = require("../controllers/OrderController")
