@@ -1,4 +1,4 @@
-const Order = require('../models/Order'); // Importe a classe Order
+const Order = require('../models/Order');
 
 class OrderService {
   constructor(productCatalogService, paymentService) {
@@ -26,7 +26,7 @@ class OrderService {
     }
 
     const orderId = this.orders.length + 1;
-    const newOrder = new Order(orderId, userId, updatedItems, total); // Usando a classe Order
+    const newOrder = new Order(orderId, userId, updatedItems, total);
     this.orders.push(newOrder);
 
     for (const item of items) {

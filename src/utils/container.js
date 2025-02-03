@@ -7,15 +7,18 @@ const OrderView = require('../views/OrderView');
 const ProductCatalogService = require('../services/ProductCatalogService');
 const OrderService = require('../services/OrderService');
 const PaymentService = require('../services/PaymentService');
+const AuthenticationService = require('../services/AuthenticationService');
 
 function container() {
-  const authenticationController = new AuthenticationController();
+  const authenticationService = new AuthenticationService();
+  const authenticationController = new AuthenticationController(authenticationService);
   const productCatalogService = new ProductCatalogService();
   const paymentService = new PaymentService();
   const orderService = new OrderService(productCatalogService, paymentService);
   
   return {
     authenticationController,
+    authenticationService,
     productCatalogController: new ProductCatalogController(productCatalogService, authenticationController),
     orderController: new OrderController(orderService, authenticationController),
     authenticationView: new AuthenticationView(),
